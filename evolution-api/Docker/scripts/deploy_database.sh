@@ -6,6 +6,16 @@ if [ "$DOCKER_ENV" != "true" ]; then
     export_env_vars
 fi
 
+# Ajustar pool do Prisma para evitar P2024 no Render (timeout/limite de conexões)
+# Reduz connection_limit e aumenta pool_timeout para DB com poucas conexões (ex.: PostgreSQL free)
+if [ -n "$DATABASE_CONNECTION_URI" ] && [[ "$DATABASE_CONNECTION_URI" != *"connection_limit"* ]]; then
+  if [[ "$DATABASE_CONNECTION_URI" == *"?"* ]]; then
+    export DATABASE_CONNECTION_URI="${DATABASE_CONNECTION_URI}&connection_limit=5&pool_timeout=30"
+  else
+    export DATABASE_CONNECTION_URI="${DATABASE_CONNECTION_URI}?connection_limit=5&pool_timeout=30"
+  fi
+fi
+
 if [[ "$DATABASE_PROVIDER" == "postgresql" || "$DATABASE_PROVIDER" == "mysql" || "$DATABASE_PROVIDER" == "psql_bouncer" ]]; then
     export DATABASE_URL
     echo "Deploying migrations for $DATABASE_PROVIDER"

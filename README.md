@@ -14,7 +14,8 @@ Repositório do projeto **MyFinance Robot**, contendo a API baseada na Evolution
 3. **Dockerfile path:** `Dockerfile` (na raiz).
 4. **Variáveis de ambiente** (obrigatórias no Render):
    - `DATABASE_PROVIDER` = `postgresql` (ou `mysql` se usar MySQL).
-   - `DATABASE_CONNECTION_URI` = URL do banco (ex.: use o PostgreSQL do Render ou externo).
+   - `DATABASE_CONNECTION_URI` = URL do banco (ex.: use o PostgreSQL do Render ou externo).  
+     O script de deploy adiciona automaticamente `connection_limit=5` e `pool_timeout=30` para evitar erro P2024 (timeout do pool) no PostgreSQL com poucas conexões. Se quiser outros valores, inclua na própria URL, ex.: `?connection_limit=3&pool_timeout=60`.
    - **Cache:** por padrão a imagem usa cache local (Redis desligado). Para usar o **Redis do Vercel (Upstash)** na Evolution:
      - No [Upstash Console](https://console.upstash.com/) (Vercel KV usa Upstash), abra o banco e copie a **Redis URL** (formato `rediss://default:...@....upstash.io:6379`). Não use a REST URL do Vercel.
      - No Render: `CACHE_REDIS_ENABLED` = `true`, `CACHE_REDIS_URI` = essa Redis URL.
