@@ -12,44 +12,46 @@ class Redis {
     this.conf = configService.get<CacheConf>('CACHE')?.REDIS;
   }
 
-  getConnection(): RedisClientType {
-    if (this.connected) {
-      return this.client;
-    } else {
-      this.client = createClient({
-        url: this.conf.URI,
-      });
-
-      this.client.on('connect', () => {
-        this.logger.verbose('redis connecting');
-      });
-
-      this.client.on('ready', () => {
-        this.logger.verbose('redis ready');
-        this.connected = true;
-      });
-
-      this.client.on('error', () => {
-        this.logger.error('redis disconnected');
-        this.connected = false;
-      });
-
-      this.client.on('end', () => {
-        this.logger.verbose('redis connection ended');
-        this.connected = false;
-      });
-
-      try {
-        this.client.connect();
-        this.connected = true;
-      } catch (e) {
-        this.connected = false;
-        this.logger.error('redis connect exception caught: ' + e);
-        return null;
-      }
-
+  getConnection(): RedisClientType | null {
+    if (!this.conf?.ENABLED || !this.conf?.URI || this.conf.URI === '') {
+      return null;
+    }
+    if (this.connected && this.client) {
       return this.client;
     }
+    this.client = createClient({
+      url: this.conf.URI,
+    });
+
+    this.client.on('connect', () => {
+      this.logger.verbose('redis connecting');
+    });
+
+    this.client.on('ready', () => {
+      this.logger.verbose('redis ready');
+      this.connected = true;
+    });
+
+    this.client.on('error', () => {
+      this.logger.error('redis disconnected');
+      this.connected = false;
+    });
+
+    this.client.on('end', () => {
+      this.logger.verbose('redis connection ended');
+      this.connected = false;
+    });
+
+    try {
+      this.client.connect();
+      this.connected = true;
+    } catch (e) {
+      this.connected = false;
+      this.logger.error('redis connect exception caught: ' + e);
+      return null;
+    }
+
+    return this.client;
   }
 }
 

@@ -17,9 +17,20 @@ export class CacheEngine {
     const cacheConf = configService.get<CacheConf>('CACHE');
 
     if (cacheConf?.REDIS?.ENABLED && cacheConf?.REDIS?.URI !== '') {
-      logger.verbose(`RedisCache initialized for ${module}`);
-      this.engine = new RedisCache(configService, module);
-    } else if (cacheConf?.LOCAL?.ENABLED) {
+      try {
+        const redisEngine = new RedisCache(configService, module);
+        if (redisEngine) {
+          logger.verbose(`RedisCache initialized for ${module}`);
+          this.engine = redisEngine;
+        }
+      } catch {
+        if (cacheConf?.LOCAL?.ENABLED) {
+          logger.verbose(`Redis not available, LocalCache initialized for ${module}`);
+          this.engine = new LocalCache(configService, module);
+        }
+      }
+    }
+    if (!this.engine && cacheConf?.LOCAL?.ENABLED) {
       logger.verbose(`LocalCache initialized for ${module}`);
       this.engine = new LocalCache(configService, module);
     }

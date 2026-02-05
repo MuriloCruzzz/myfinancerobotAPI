@@ -16,7 +16,11 @@ export class RedisCache implements ICache {
     private readonly module: string,
   ) {
     this.conf = this.configService.get<CacheConf>('CACHE')?.REDIS;
-    this.client = redisClient.getConnection();
+    const connection = redisClient.getConnection();
+    if (!connection) {
+      throw new Error('Redis cache is disabled or CACHE_REDIS_URI is not set');
+    }
+    this.client = connection;
   }
   async get(key: string): Promise<any> {
     try {

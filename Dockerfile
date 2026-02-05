@@ -12,7 +12,9 @@ WORKDIR /evolution
 COPY evolution-api/ ./
 
 # .env é exigido pelos scripts; usar .env.example como base (variáveis reais no Render)
-RUN cp .env.example .env
+RUN cp .env.example .env && \
+    sed -i 's/^CACHE_REDIS_ENABLED=true/CACHE_REDIS_ENABLED=false/' .env && \
+    sed -i 's/^CACHE_LOCAL_ENABLED=false/CACHE_LOCAL_ENABLED=true/' .env
 
 # Instalar dependências antes dos scripts (db:generate e build precisam de node_modules)
 RUN npm ci --silent
