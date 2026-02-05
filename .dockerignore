@@ -1,0 +1,16 @@
+# Contexto do build = raiz do repo (evolution-api/ é copiado no Dockerfile)
+.git
+.gitignore
+*.md
+!evolution-api/README.md
+
+# Dentro de evolution-api: não enviar para o daemon (acelera build)
+evolution-api/.git
+evolution-api/node_modules
+evolution-api/dist
+evolution-api/.env
+evolution-api/.cursor
+evolution-api/.husky
+evolution-api/.github
+evolution-api/.vscode
+evolution-api/*.log
