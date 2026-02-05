@@ -48,4 +48,6 @@ COPY --from=builder /evolution/tsup.config.ts ./tsup.config.ts
 
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/bash", "-c", ". ./Docker/scripts/deploy_database.sh && npm run start:prod"]
+# Render (e outros PaaS) definem PORT em runtime; a Evolution API usa SERVER_PORT.
+# Garantir que a app escute na porta que o Render espera.
+ENTRYPOINT ["/bin/bash", "-c", "export SERVER_PORT=${PORT:-8080} && . ./Docker/scripts/deploy_database.sh && npm run start:prod"]
